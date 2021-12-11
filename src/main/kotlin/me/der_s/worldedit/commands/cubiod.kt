@@ -1,11 +1,11 @@
-package me.der_s.WorldEdit.Commands
+package me.der_s.worldedit.commands
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import me.der_s.Utils.Utils.toMini
-import me.der_s.WorldEdit.WorldEditRegion
-import me.der_s.WorldEdit.cuboid
+import me.der_s.utils.Utils.toMini
+import me.der_s.worldedit.WorldEditRegion
+import me.der_s.worldedit.cuboid
 import net.minestom.server.command.builder.arguments.ArgumentType
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.entity.Player
@@ -20,23 +20,23 @@ class cuboid : WorldEditCommand("cuboid") {
         val block = ArgumentType.BlockState("block")
 
         setDefaultExecutor { sender, context ->
-            sender.sendMessage("<red>Incorrect Usage: Use /cuboid <width> <height> <length> <block>".toMini())
+            sender.sendMessage("<red><bold>[WORLD-EDIT] Incorrect Usage: Use /cuboid <width> <height> <length> <block>".toMini())
         }
 
         width.setCallback { sender, exception ->
-            sender.sendMessage(("<red>ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
+            sender.sendMessage(("<red><bold>[WORLD-EDIT] ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
         }
 
         height.setCallback { sender, exception ->
-            sender.sendMessage(("<red>ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
+            sender.sendMessage(("<red><bold>[WORLD-EDIT] ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
         }
 
         length.setCallback { sender, exception ->
-            sender.sendMessage(("<red>ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
+            sender.sendMessage(("<red><bold>[WORLD-EDIT] ERROR: The value \"" + exception.input + "\" is not an Integer").toMini())
         }
 
         block.setCallback { sender, exception ->
-            sender.sendMessage(("<red>ERROR: The value \"" + exception.input + "\" is not a Block").toMini())
+            sender.sendMessage(("<red><bold>[WORLD-EDIT] ERROR: The value \"" + exception.input + "\" is not a Block").toMini())
         }
 
         addSyntax({ sender, context ->
@@ -52,7 +52,7 @@ class cuboid : WorldEditCommand("cuboid") {
 
             val worldEditRegion = WorldEditRegion(pos, Pos(pos.x + w, pos.y + h, pos.z + l))
             CoroutineScope(Dispatchers.IO).launch {
-                sender.sendMessage(("<green>Success! Pasted " + worldEditRegion.getAreaFormatted() + " blocks in " + cuboid(worldEditRegion, b, p.instance!!) + " ms").toMini())
+                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + worldEditRegion.getAreaFormatted() + " blocks in " + cuboid(worldEditRegion, b, p.instance!!) + " ms").toMini())
             }
         }, width, height, length, block)
     }

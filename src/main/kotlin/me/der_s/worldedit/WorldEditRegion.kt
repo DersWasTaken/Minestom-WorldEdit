@@ -1,4 +1,4 @@
-package me.der_s.WorldEdit
+package me.der_s.worldedit
 
 import net.minestom.server.coordinate.Pos
 import java.lang.Double

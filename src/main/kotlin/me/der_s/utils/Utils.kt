@@ -1,7 +1,6 @@
-package me.der_s.Utils
+package me.der_s.utils
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.markdown.DiscordFlavor
 

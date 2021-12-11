@@ -1,4 +1,4 @@
-package me.der_s.Commands
+package me.der_s.commands
 
 import net.minestom.server.MinecraftServer
 import net.minestom.server.command.CommandSender

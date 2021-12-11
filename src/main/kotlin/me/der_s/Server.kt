@@ -4,10 +4,16 @@ import gg.AstroMC.Utils.EventRestable
 import gg.AstroMC.Utils.enableDefaultEvents
 import gg.AstroMC.World.VoidGenerator
 import kotlinx.coroutines.DelicateCoroutinesApi
-import me.der_s.Commands.StopCommand
-import me.der_s.WorldEdit.Commands.cuboid
-import me.der_s.WorldEdit.Commands.pyramid
-import me.der_s.WorldEdit.Commands.sphere
+import me.der_s.commands.StopCommand
+import me.der_s.utils.Utils.toMini
+import me.der_s.worldedit.WorldEdit
+import me.der_s.worldedit.commands.cuboid
+import me.der_s.worldedit.commands.player.wand
+import me.der_s.worldedit.commands.pyramid
+import me.der_s.worldedit.commands.selectedregion
+import me.der_s.worldedit.commands.sphere
+import net.kyori.adventure.key.Key
+import net.kyori.adventure.sound.Sound
 import net.minestom.server.MinecraftServer
 import net.minestom.server.UpdateManager
 import net.minestom.server.advancements.AdvancementManager
@@ -17,8 +23,7 @@ import net.minestom.server.coordinate.Pos
 import net.minestom.server.data.DataManager
 import net.minestom.server.entity.GameMode
 import net.minestom.server.event.GlobalEventHandler
-import net.minestom.server.event.player.PlayerLoginEvent
-import net.minestom.server.event.player.PlayerSpawnEvent
+import net.minestom.server.event.player.*
 import net.minestom.server.exception.ExceptionManager
 import net.minestom.server.extensions.ExtensionManager
 import net.minestom.server.extras.MojangAuth
@@ -27,9 +32,11 @@ import net.minestom.server.gamedata.tags.TagManager
 import net.minestom.server.instance.Instance
 import net.minestom.server.instance.InstanceManager
 import net.minestom.server.instance.block.BlockManager
+import net.minestom.server.item.Material
 import net.minestom.server.listener.manager.PacketListenerManager
 import net.minestom.server.monitoring.BenchmarkManager
 import net.minestom.server.network.ConnectionManager
+import net.minestom.server.network.packet.server.play.BlockBreakAnimationPacket
 import net.minestom.server.network.socket.Server
 import net.minestom.server.recipe.RecipeManager
 import net.minestom.server.scoreboard.TeamManager
@@ -190,6 +197,7 @@ internal object Server {
         COMMAND_MANAGER.register(cuboid())
         COMMAND_MANAGER.register(sphere())
         COMMAND_MANAGER.register(pyramid())
+        COMMAND_MANAGER.register(wand())
 
         /*
         ENABLE DEFAULT RESTABLES
@@ -197,14 +205,15 @@ internal object Server {
         EventRestable(PlayerLoginEvent::class.java, { playerLoginEvent: PlayerLoginEvent ->
             val p = playerLoginEvent.player
             playerLoginEvent.setSpawningInstance(WORLD)
-            p.setGameMode(GameMode.SPECTATOR)
+            p.setGameMode(GameMode.CREATIVE)
             p.isAllowFlying = true
             true
         })
 
         EventRestable(PlayerSpawnEvent::class.java, {playerSpawnEvent ->
-            playerSpawnEvent.player.teleport( Pos(0.0,50.0,0.0))
-            true })
+            playerSpawnEvent.player.teleport( Pos(0.0,51.0,0.0))
+            true
+        })
     }
 
 }

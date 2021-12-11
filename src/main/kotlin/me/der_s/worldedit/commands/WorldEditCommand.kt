@@ -1,4 +1,4 @@
-package me.der_s.WorldEdit.Commands
+package me.der_s.worldedit.commands
 
 import net.minestom.server.command.builder.Command
 

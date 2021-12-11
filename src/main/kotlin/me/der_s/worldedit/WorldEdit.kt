@@ -1,6 +1,8 @@
-package me.der_s.WorldEdit
+package me.der_s.worldedit
 
+import me.der_s.worldedit.commands.selectedregion
 import net.minestom.server.coordinate.Pos
+import net.minestom.server.entity.Player
 import net.minestom.server.instance.Chunk
 import net.minestom.server.instance.Instance
 import net.minestom.server.instance.batch.AbsoluteBlockBatch
@@ -9,6 +11,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 internal object WorldEdit {
+
+    val playerRegions = mutableMapOf<Player, selectedregion>()
 
 }
 
