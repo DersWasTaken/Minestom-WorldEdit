@@ -1,20 +1,16 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10-RC'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.0'
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 group 'me.der_s'
 version '1.0'
 
-allprojects {
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
-}
-
 repositories {
     mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -23,9 +19,15 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     implementation "net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT"
-    implementation 'com.github.Minestom:Minestom:960134dc8f'
+    implementation 'com.github.Minestom:Minestom:59bb096'
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'me.der_s.Server'
+    }
 }
 
 test {

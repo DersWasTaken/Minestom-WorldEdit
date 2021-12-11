@@ -5,7 +5,6 @@
       <configuration>
         <autoDetectTypes>
           <platformType>ADVENTURE</platformType>
-          <platformType>MIXIN</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>

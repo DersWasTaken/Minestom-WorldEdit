@@ -1,14 +1,13 @@
-package gg.AstroMC
+package me.der_s
 
-import gg.AstroMC.Commands.StopCommand
-import gg.AstroMC.Server.COMMAND_MANAGER
 import gg.AstroMC.Utils.EventRestable
 import gg.AstroMC.Utils.enableDefaultEvents
-import gg.AstroMC.WorldEdit.WorldEdit
-import gg.AstroMC.WorldEdit.cuboid
-import kotlinx.coroutines.*
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.sound.Sound
+import gg.AstroMC.World.VoidGenerator
+import kotlinx.coroutines.DelicateCoroutinesApi
+import me.der_s.Commands.StopCommand
+import me.der_s.WorldEdit.Commands.cuboid
+import me.der_s.WorldEdit.Commands.pyramid
+import me.der_s.WorldEdit.Commands.sphere
 import net.minestom.server.MinecraftServer
 import net.minestom.server.UpdateManager
 import net.minestom.server.advancements.AdvancementManager
@@ -17,9 +16,7 @@ import net.minestom.server.command.CommandManager
 import net.minestom.server.coordinate.Pos
 import net.minestom.server.data.DataManager
 import net.minestom.server.entity.GameMode
-import net.minestom.server.entity.Player
 import net.minestom.server.event.GlobalEventHandler
-import net.minestom.server.event.player.PlayerDisconnectEvent
 import net.minestom.server.event.player.PlayerLoginEvent
 import net.minestom.server.event.player.PlayerSpawnEvent
 import net.minestom.server.exception.ExceptionManager
@@ -38,12 +35,11 @@ import net.minestom.server.recipe.RecipeManager
 import net.minestom.server.scoreboard.TeamManager
 import net.minestom.server.storage.StorageManager
 import net.minestom.server.timer.SchedulerManager
-import net.minestom.server.world.Difficulty
+import net.minestom.server.utils.NamespaceID
+import net.minestom.server.world.DimensionType
 import net.minestom.server.world.DimensionTypeManager
 import net.minestom.server.world.biomes.BiomeManager
 import org.slf4j.Logger
-import java.nio.file.Path
-import kotlin.coroutines.CoroutineContext
 
 internal object Server {
 
@@ -145,7 +141,28 @@ internal object Server {
         /*
         CREATE WORLD
          */
-        WORLD = INSTANCE_MANAGER.createInstanceContainer()
+
+        val OVERWORLD = DimensionType.builder(NamespaceID.from("minecraft:overworld2"))
+            .ultrawarm(false)
+            .natural(true)
+            .piglinSafe(false)
+            .respawnAnchorSafe(false)
+            .bedSafe(true)
+            .raidCapable(true)
+            .skylightEnabled(true)
+            .ceilingEnabled(false)
+            .fixedTime(null)
+            .ambientLight(0.0f)
+            .height(320)
+            .logicalHeight(320)
+            .infiniburn(NamespaceID.from("minecraft:infiniburn_overworld"))
+            .minY(-64)
+            .build()
+
+        DIMENSION_TYPE_MANAGER.addDimension(OVERWORLD)
+
+        WORLD = INSTANCE_MANAGER.createInstanceContainer(OVERWORLD)
+        WORLD.chunkGenerator = VoidGenerator()
 
         /*
         BUILD SHUTDOWN TASK
@@ -164,12 +181,15 @@ internal object Server {
         /*
         START SERVER
          */
-        MINECRAFT_SERVER.start("localhost", 25565)
+        MINECRAFT_SERVER.start("0.0.0.0", 25565)
 
         /*
         REGISTER COMMANDS
          */
         COMMAND_MANAGER.register(StopCommand())
+        COMMAND_MANAGER.register(cuboid())
+        COMMAND_MANAGER.register(sphere())
+        COMMAND_MANAGER.register(pyramid())
 
         /*
         ENABLE DEFAULT RESTABLES
@@ -177,17 +197,14 @@ internal object Server {
         EventRestable(PlayerLoginEvent::class.java, { playerLoginEvent: PlayerLoginEvent ->
             val p = playerLoginEvent.player
             playerLoginEvent.setSpawningInstance(WORLD)
-            p.setGameMode(GameMode.CREATIVE)
+            p.setGameMode(GameMode.SPECTATOR)
             p.isAllowFlying = true
             true
         })
 
         EventRestable(PlayerSpawnEvent::class.java, {playerSpawnEvent ->
             playerSpawnEvent.player.teleport( Pos(0.0,50.0,0.0))
-            CoroutineScope(Dispatchers.IO).launch {
-                cuboid(100,100,100,0,0,0, WORLD)
-            }
-            false })
+            true })
     }
 
 }
