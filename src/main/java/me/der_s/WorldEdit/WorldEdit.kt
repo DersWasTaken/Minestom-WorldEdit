@@ -12,8 +12,6 @@ internal object WorldEdit {
 
 }
 
-
-
 internal suspend fun sphere(pos: Pos, radius: Int, block: Block, instance: Instance): Long {
     val start = System.currentTimeMillis()
 
