@@ -1,5 +1,8 @@
 package me.der_s.worldedit
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.whileSelect
 import me.der_s.worldedit.commands.selectedregion
 import net.minestom.server.coordinate.Pos
@@ -61,14 +64,14 @@ fun minMax(first: Pos, second: Pos): Pair<Array<Int>, Array<Int>> {
     )
 }
 
-internal suspend fun sphere(pos: Pos, radius: Int, block: Block, instance: Instance): CompletableFuture<Long> {
+internal suspend fun sphere(pos: Pos, radius: Int,  editOptions: EditOptions, instance: Instance): CompletableFuture<Long> {
     val future = CompletableFuture<Long>()
 
     val start = System.currentTimeMillis()
 
     val map = hashMapOf<Chunk, AbsoluteBlockBatch>()
-    
-    val iter = getPointsBetween(pos, pos.apply { x, y, z, yaw, pitch ->  
+
+    val iter = getPointsBetween(pos, pos.apply { x, y, z, yaw, pitch ->
         return@apply Pos(x + radius, y + radius, z + radius)
     }).iterator()
 
@@ -86,11 +89,11 @@ internal suspend fun sphere(pos: Pos, radius: Int, block: Block, instance: Insta
         val dist =
             (((x - center.blockX()) * (x - center.blockX()) + (y - center.blockY()) * (y - center.blockY()) + (z - center.blockZ()) * (z - center.blockZ())).toDouble()).pow(0.5)
 
-        if(dist <= radius / 2) {
+        if (dist +- 0.5 <= (radius) / 2) {
             val chunk = instance.getChunkAt(x.toDouble(), z.toDouble()) ?: continue
             val chunkBatch = map[chunk] ?: AbsoluteBlockBatch()
 
-            chunkBatch.setBlock(x,y,z, block)
+            chunkBatch.setBlock(x, y, z, editOptions.block)
 
             map[chunk] = chunkBatch
         }
@@ -105,11 +108,71 @@ internal suspend fun sphere(pos: Pos, radius: Int, block: Block, instance: Insta
         }
     }
 
+    if(editOptions.hollow) {
+        sphere(pos.apply { x, y, z, yaw, pitch ->
+            Pos(x + 1, y + 1, z + 1)
+        }, radius - 2, EditOptions(false, Block.AIR), instance)
+    }
+
     return future;
 
 }
 
-internal suspend fun pyramid(size: Int, pos: Pos, block: Block, instance: Instance) : CompletableFuture<Long>  {
+internal suspend fun cylinder(pos: Pos, height: Int, radius: Int, editOptions: EditOptions, instance: Instance): CompletableFuture<Long> {
+    val future = CompletableFuture<Long>()
+
+    val start = System.currentTimeMillis()
+
+    val map = hashMapOf<Chunk, AbsoluteBlockBatch>()
+
+    val iter = getPointsBetween(pos, pos.apply { x, y, z, yaw, pitch ->
+        return@apply Pos(x + radius, y + height, z + radius)
+    }).iterator()
+
+    val center = pos.apply { x, y, z, yaw, pitch ->
+        return@apply Pos(x + (radius / 2), y + (height / 2), z + (radius / 2))
+    }
+
+    while (iter.hasNext()) {
+        val b = iter.next()
+
+        val x = b.blockX()
+        val y = b.blockY()
+        val z = b.blockZ()
+
+        val dist =
+            (((x - center.blockX()) * (x - center.blockX()) + (z - center.blockZ()) * (z - center.blockZ())).toDouble()).pow(0.5)
+
+        if (dist +- 0.5 <= (radius) / 2) {
+            val chunk = instance.getChunkAt(x.toDouble(), z.toDouble()) ?: continue
+            val chunkBatch = map[chunk] ?: AbsoluteBlockBatch()
+
+            chunkBatch.setBlock(x, y, z, editOptions.block)
+
+            map[chunk] = chunkBatch
+        }
+    }
+
+    var end: Long = 0
+
+    for ((_,value) in map) {
+        value.apply(instance) {
+            end = System.currentTimeMillis()
+            future.complete((end - start))
+        }
+    }
+
+    if(editOptions.hollow) {
+        cylinder(pos.apply { x, y, z, yaw, pitch ->
+            Pos(x + 1, y + 1, z + 1)
+        }, height - 2, radius - 2, EditOptions(false, Block.AIR), instance)
+    }
+
+    return future;
+
+}
+
+internal suspend fun pyramid(size: Int, pos: Pos,  editOptions: EditOptions, instance: Instance) : CompletableFuture<Long>  {
     val future = CompletableFuture<Long>()
 
     val start = System.currentTimeMillis()
@@ -121,7 +184,8 @@ internal suspend fun pyramid(size: Int, pos: Pos, block: Block, instance: Instan
     for(y in pos.y.toInt() until (pos.y + size).toInt()) {
         val leftPos = Pos(pos.x  - offset + size, y.toDouble(), pos.z - offset + size)
         val rightPos = Pos(pos.x + offset + size, y.toDouble(), pos.z + offset + size)
-        t += cuboid(WorldEditRegion(leftPos, rightPos), block, instance).get()
+        val worldEditRegion = WorldEditRegion(leftPos, rightPos);
+        t += cuboid(worldEditRegion, editOptions, instance).get()
         offset--
     }
 
@@ -132,7 +196,7 @@ internal suspend fun pyramid(size: Int, pos: Pos, block: Block, instance: Instan
     return future;
 }
 
-internal suspend fun cuboid(worldEditRegion: WorldEditRegion, block: Block, instance: Instance): CompletableFuture<Long> {
+internal suspend fun cuboid(worldEditRegion: WorldEditRegion, editOptions: EditOptions, instance: Instance): CompletableFuture<Long> {
 
     val future = CompletableFuture<Long>()
 
@@ -146,10 +210,11 @@ internal suspend fun cuboid(worldEditRegion: WorldEditRegion, block: Block, inst
 
     while(iterator.hasNext()) {
         val pos = iterator.next()
+
         val chunk = instance.getChunkAt(pos.x, pos.z) ?: continue
         val chunkBatch = map[chunk] ?: AbsoluteBlockBatch()
 
-        chunkBatch.setBlock(pos.blockX(),pos.blockY(),pos.blockZ(),block)
+        chunkBatch.setBlock(pos.blockX(), pos.blockY(), pos.blockZ(), editOptions.block)
 
         map[chunk] = chunkBatch
     }
@@ -157,11 +222,20 @@ internal suspend fun cuboid(worldEditRegion: WorldEditRegion, block: Block, inst
     var end: Long = 0
 
     for ((chunk,value) in map) {
-        instance.loadChunk(chunk.chunkX, chunk.chunkZ)
         value.apply(instance) {
             end = System.currentTimeMillis()
             future.complete((end - start))
         }
+    }
+
+    if(editOptions.hollow ) {
+        val pos1 = worldEditRegion.first.apply { x, y, z, yaw, pitch ->
+            Pos(x + 1, y + 1, z + 1)
+        }
+        val pos2 =  worldEditRegion.second.apply { x, y, z, yaw, pitch ->
+            Pos(x - 1, y - 1, z - 1)
+        }
+        cuboid(WorldEditRegion(pos1, pos2), EditOptions(false, Block.AIR), instance)
     }
 
     return future

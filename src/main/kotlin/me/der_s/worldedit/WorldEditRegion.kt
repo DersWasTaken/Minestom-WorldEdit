@@ -8,16 +8,16 @@ import kotlin.math.min
 
 data class WorldEditRegion(val first: Pos, val second: Pos) {
 
-    private val minX = min(first.x, second.x)
-    private val maxX = Double.max(first.x, second.x)
+     val minX = min(first.x, second.x)
+     val maxX = Double.max(first.x, second.x)
 
-    private val minY = max(min(first.y, second.y),-63.0)
-    private val maxY = min(Double.max(first.y, second.y),319.0)
+     val minY = max(min(first.y, second.y),-63.0)
+     val maxY = min(Double.max(first.y, second.y),319.0)
 
-    private val minZ = min(first.z, second.z)
-    private val maxZ = Double.max(first.z, second.z)
+     val minZ = min(first.z, second.z)
+     val maxZ = Double.max(first.z, second.z)
     
-    fun getArea() : Int {
+    private fun getArea() : Int {
         return ((maxX - minX) * (maxY - minY) * (maxZ - minZ)).toInt()
     }
 

@@ -6,6 +6,7 @@ import gg.AstroMC.World.VoidGenerator
 import kotlinx.coroutines.DelicateCoroutinesApi
 import me.der_s.commands.StopCommand
 import me.der_s.worldedit.commands.cuboid
+import me.der_s.worldedit.commands.cylinder
 import me.der_s.worldedit.commands.player.pos1
 import me.der_s.worldedit.commands.player.pos2
 import me.der_s.worldedit.commands.pyramid
@@ -191,6 +192,8 @@ internal object Server {
         COMMAND_MANAGER.register(cuboid())
         COMMAND_MANAGER.register(sphere())
         COMMAND_MANAGER.register(pyramid())
+        COMMAND_MANAGER.register(cylinder())
+
         COMMAND_MANAGER.register(pos1())
         COMMAND_MANAGER.register(pos2())
 
