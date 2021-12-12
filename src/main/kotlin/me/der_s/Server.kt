@@ -5,15 +5,11 @@ import gg.AstroMC.Utils.enableDefaultEvents
 import gg.AstroMC.World.VoidGenerator
 import kotlinx.coroutines.DelicateCoroutinesApi
 import me.der_s.commands.StopCommand
-import me.der_s.utils.Utils.toMini
-import me.der_s.worldedit.WorldEdit
 import me.der_s.worldedit.commands.cuboid
-import me.der_s.worldedit.commands.player.wand
+import me.der_s.worldedit.commands.player.pos1
+import me.der_s.worldedit.commands.player.pos2
 import me.der_s.worldedit.commands.pyramid
-import me.der_s.worldedit.commands.selectedregion
 import me.der_s.worldedit.commands.sphere
-import net.kyori.adventure.key.Key
-import net.kyori.adventure.sound.Sound
 import net.minestom.server.MinecraftServer
 import net.minestom.server.UpdateManager
 import net.minestom.server.advancements.AdvancementManager
@@ -32,11 +28,9 @@ import net.minestom.server.gamedata.tags.TagManager
 import net.minestom.server.instance.Instance
 import net.minestom.server.instance.InstanceManager
 import net.minestom.server.instance.block.BlockManager
-import net.minestom.server.item.Material
 import net.minestom.server.listener.manager.PacketListenerManager
 import net.minestom.server.monitoring.BenchmarkManager
 import net.minestom.server.network.ConnectionManager
-import net.minestom.server.network.packet.server.play.BlockBreakAnimationPacket
 import net.minestom.server.network.socket.Server
 import net.minestom.server.recipe.RecipeManager
 import net.minestom.server.scoreboard.TeamManager
@@ -197,7 +191,8 @@ internal object Server {
         COMMAND_MANAGER.register(cuboid())
         COMMAND_MANAGER.register(sphere())
         COMMAND_MANAGER.register(pyramid())
-        COMMAND_MANAGER.register(wand())
+        COMMAND_MANAGER.register(pos1())
+        COMMAND_MANAGER.register(pos2())
 
         /*
         ENABLE DEFAULT RESTABLES

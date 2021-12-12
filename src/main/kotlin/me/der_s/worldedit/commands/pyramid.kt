@@ -40,7 +40,7 @@ class pyramid : WorldEditCommand("pyramid") {
             val blocks = (s * s * s) / 3
 
             CoroutineScope(Dispatchers.IO).launch {
-                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + blocks + " blocks in " + pyramid(s, pos, b, p.instance!!) + " ms").toMini())
+                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + blocks + " blocks in " + pyramid(s, pos, b, p.instance!!).get() + " ms").toMini())
             }
         }, size, block)
 

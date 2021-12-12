@@ -39,7 +39,7 @@ class sphere : WorldEditCommand("sphere") {
             val blocks = 1.25 * (Math.PI * (r * r * r))
 
             CoroutineScope(Dispatchers.IO).launch {
-                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + blocks.toInt() + " blocks in " + sphere(pos, r, b, p.instance!!) + " ms").toMini())
+                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + blocks.toInt() + " blocks in " + sphere(pos, r, b, p.instance!!).get() + " ms").toMini())
             }
         }, radius, block)
 

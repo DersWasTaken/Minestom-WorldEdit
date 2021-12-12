@@ -52,7 +52,7 @@ class cuboid : WorldEditCommand("cuboid") {
 
             val worldEditRegion = WorldEditRegion(pos, Pos(pos.x + w, pos.y + h, pos.z + l))
             CoroutineScope(Dispatchers.IO).launch {
-                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + worldEditRegion.getAreaFormatted() + " blocks in " + cuboid(worldEditRegion, b, p.instance!!) + " ms").toMini())
+                sender.sendMessage(("<green><bold>[WORLD-EDIT] Success! Pasted " + worldEditRegion.getAreaFormatted() + " blocks in " + cuboid(worldEditRegion, b, p.instance!!).get() + " ms").toMini())
             }
         }, width, height, length, block)
     }
